@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App Builder — Deriv API Dashboard (Prototype)</title>
+<style>
+  :root {
+    --red: #FF444F;
+    --red-dark: #E03842;
+    --dark: #0E0E0E;
+    --grey-900: #333333;
+    --grey-600: #666666;
+    --grey-400: #999999;
+    --grey-200: #E0E0E0;
+    --grey-100: #F5F5F5;
+    --white: #FFFFFF;
+    --green: #4BB543;
+    --blue: #2196F3;
+    --orange: #FF9800;
+    --radius: 8px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--grey-100); color: var(--grey-900); min-height: 100vh; }
+
+  /* Top nav */
+  .topbar { background: var(--dark); padding: 14px 32px; display: flex; align-items: center; gap: 16px; }
+  .topbar .logo { color: var(--red); font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
+  .topbar .sep { color: var(--grey-600); font-size: 20px; }
+  .topbar .section-title { color: var(--grey-400); font-size: 14px; font-weight: 500; }
+  .topbar .badge { background: var(--red); color: var(--white); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Layout */
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+  /* Progress stepper */
+  .stepper { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 40px; }
+  .step-item { display: flex; align-items: center; gap: 0; }
+  .step-circle {
+    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; border: 2px solid var(--grey-200); color: var(--grey-400); background: var(--white);
+    transition: all 0.3s ease; flex-shrink: 0;
+  }
+  .step-circle.active { border-color: var(--red); color: var(--white); background: var(--red); }
+  .step-circle.done { border-color: var(--green); color: var(--white); background: var(--green); }
+  .step-label { font-size: 13px; color: var(--grey-400); margin-left: 8px; font-weight: 500; white-space: nowrap; transition: color 0.3s; }
+  .step-label.active { color: var(--grey-900); font-weight: 600; }
+  .step-label.done { color: var(--green); }
+  .step-line { width: 80px; height: 2px; background: var(--grey-200); margin: 0 12px; transition: background 0.3s; }
+  .step-line.done { background: var(--green); }
+
+  /* Card */
+  .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px; }
+  .card h2 { font-size: 22px; color: var(--grey-900); margin-bottom: 6px; }
+  .card .subtitle { font-size: 14px; color: var(--grey-600); margin-bottom: 28px; }
+
+  /* Form fields */
+  .field { margin-bottom: 22px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--grey-900); margin-bottom: 6px; }
+  .field label .optional { color: var(--grey-400); font-weight: 400; }
+  .field input, .field select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--grey-200); border-radius: 6px; font-size: 14px; color: var(--grey-900); background: var(--white); outline: none; transition: border-color 0.2s; }
+  .field input:focus, .field select:focus { border-color: var(--red); }
+  .field input.error { border-color: var(--red); background: #FFF5F5; }
+  .field .hint { font-size: 12px; color: var(--grey-400); margin-top: 4px; }
+  .field .error-msg { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
+  .field input.error + .hint { display: none; }
+  .field input.error ~ .error-msg { display: block; }
+
+  /* Markup special */
+  .markup-wrapper { position: relative; }
+  .markup-wrapper input { padding-right: 36px; }
+  .markup-wrapper .suffix { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--grey-400); font-size: 14px; pointer-events: none; }
+
+  /* Two-col layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* Upload zone */
+  .upload-zone {
+    border: 2px dashed var(--grey-200); border-radius: var(--radius); padding: 32px; text-align: center;
+    cursor: pointer; transition: all 0.2s; background: var(--grey-100);
+  }
+  .upload-zone:hover { border-color: var(--red); background: #FFF5F5; }
+  .upload-zone .icon { font-size: 32px; margin-bottom: 8px; }
+  .upload-zone .label { font-size: 14px; color: var(--grey-600); }
+  .upload-zone .formats { font-size: 11px; color: var(--grey-400); margin-top: 4px; }
+  .upload-zone.has-file { border-color: var(--green); border-style: solid; background: #F0FFF0; }
+  .upload-zone.has-file .icon::before { content: "✓"; }
+
+  /* Colour picker row */
+  .colour-row { display: flex; align-items: center; gap: 12px; }
+  .colour-row input[type="color"] { width: 48px; height: 40px; border: 1.5px solid var(--grey-200); border-radius: 6px; cursor: pointer; padding: 2px; }
+  .colour-row input[type="text"] { flex: 1; }
+
+  /* Preview pane */
+  .preview-pane {
+    background: var(--grey-100); border-radius: var(--radius); padding: 20px; margin-top: 24px;
+    border: 1px solid var(--grey-200);
+  }
+  .preview-pane .preview-title { font-size: 12px; font-weight: 600; color: var(--grey-400); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .preview-phone {
+    width: 240px; height: 420px; background: var(--white); border-radius: 20px; margin: 0 auto;
+    box-shadow: var(--shadow-lg); overflow: hidden; position: relative;
+    border: 2px solid var(--grey-200);
+  }
+  .preview-phone .phone-header { padding: 16px; text-align: center; }
+  .preview-phone .phone-header .phone-logo { width: 40px; height: 40px; border-radius: 8px; background: var(--grey-200); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--grey-400); overflow: hidden; }
+  .preview-phone .phone-header .phone-logo img { width: 100%; height: 100%; object-fit: contain; }
+  .preview-phone .phone-title { font-size: 12px; font-weight: 700; }
+  .preview-phone .phone-body { padding: 0 16px; }
+  .preview-phone .phone-digit-row { display: flex; justify-content: center; gap: 6px; margin: 12px 0; }
+  .preview-phone .digit-box { width: 32px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: var(--white); }
+  .preview-phone .phone-bar { height: 6px; background: var(--grey-200); border-radius: 3px; margin: 8px 0; }
+  .preview-phone .phone-bar-short { width: 60%; }
+  .preview-phone .phone-btn { margin: 16px auto; width: 80%; padding: 8px; border-radius: 6px; text-align: center; color: var(--white); font-size: 11px; font-weight: 700; }
+
+  /* Hosting options */
+  .host-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .host-card {
+    border: 2px solid var(--grey-200); border-radius: var(--radius); padding: 24px; text-align: center;
+    cursor: pointer; transition: all 0.2s; background: var(--white);
+  }
+  .host-card:hover { border-color: var(--red); box-shadow: var(--shadow); }
+  .host-card.selected { border-color: var(--red); background: #FFF5F5; }
+  .host-card .host-icon { font-size: 28px; margin-bottom: 8px; }
+  .host-card .host-name { font-size: 16px; font-weight: 700; color: var(--grey-900); }
+  .host-card .host-desc { font-size: 12px; color: var(--grey-600); margin-top: 4px; }
+
+  .divider { border: none; border-top: 1px solid var(--grey-200); margin: 28px 0; }
+  .export-section h3 { font-size: 16px; margin-bottom: 16px; color: var(--grey-900); }
+
+  /* Buttons */
+  .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }
+  .btn { padding: 11px 28px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-primary { background: var(--red); color: var(--white); }
+  .btn-primary:hover { background: var(--red-dark); }
+  .btn-secondary { background: var(--white); color: var(--grey-900); border: 1.5px solid var(--grey-200); }
+  .btn-secondary:hover { border-color: var(--grey-400); }
+  .btn-ghost { background: none; color: var(--grey-600); border: none; }
+  .btn-ghost:hover { color: var(--grey-900); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-deploy { background: var(--blue); color: var(--white); padding: 12px 32px; font-size: 15px; }
+  .btn-deploy:hover { background: #1976D2; }
+  .btn-export { background: var(--grey-900); color: var(--white); }
+  .btn-export:hover { background: #111; }
+
+  /* Success state */
+  .success-banner {
+    background: #F0FFF0; border: 1px solid #C8E6C9; border-radius: var(--radius);
+    padding: 24px; text-align: center; display: none;
+  }
+  .success-banner .success-icon { font-size: 48px; margin-bottom: 12px; }
+  .success-banner h3 { color: var(--green); margin-bottom: 8px; }
+  .success-banner .url { font-family: monospace; background: var(--white); padding: 8px 16px; border-radius: 4px; display: inline-block; margin-top: 8px; font-size: 13px; border: 1px solid var(--grey-200); }
+
+  /* Validation tooltip */
+  .valid-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; font-weight: 600; vertical-align: middle; }
+  .valid-badge.ok { background: #E8F5E9; color: #2E7D32; }
+  .valid-badge.fail { background: #FFEBEE; color: #C62828; }
+
+  /* Prototype label */
+  .proto-banner { background: var(--orange); color: var(--white); text-align: center; font-size: 12px; font-weight: 700; padding: 6px; letter-spacing: 0.5px; }
+
+  .hidden { display: none !important; }
+
+  /* Info callout */
+  .callout { background: #FFF8E1; border-left: 3px solid var(--orange); padding: 12px 16px; border-radius: 0 6px 6px 0; margin-bottom: 24px; font-size: 13px; color: var(--grey-600); }
+</style>
+</head>
+<body>
+
+<div class="proto-banner">REFERENCE PROTOTYPE — App Builder v1 (Digits Phase 1)</div>
+
+<div class="topbar">
+  <span class="logo">Deriv</span>
+  <span class="sep">|</span>
+  <span class="section-title">API Dashboard</span>
+  <span class="sep">›</span>
+  <span class="section-title" style="color:#fff">App Builder</span>
+  <span class="badge">New</span>
+</div>
+
+<div class="container">
+  <!-- Stepper -->
+  <div class="stepper">
+    <div class="step-item">
+      <div class="step-circle active" id="sc1">1</div>
+      <span class="step-label active" id="sl1">Configure</span>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc2">2</div>
+      <span class="step-label" id="sl2">Customise</span>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc3">3</div>
+      <span class="step-label" id="sl3">Host &amp; Export</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: Configure -->
+  <div class="card" id="step1">
+    <h2>Configure your app</h2>
+    <p class="subtitle">Connect your Deriv account and set your trading parameters.</p>
+
+    <div class="callout">You'll need an active Deriv App ID. <a href="#" style="color:var(--red);font-weight:600;">Create one here →</a></div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>App ID <span class="valid-badge hidden" id="appid-badge"></span></label>
+        <input type="text" id="appId" placeholder="e.g. 12345" oninput="validateAppId()">
+        <div class="hint">Your registered Deriv application ID</div>
+        <div class="error-msg">Please enter a valid numeric App ID</div>
+      </div>
+      <div class="field">
+        <label>Auth Redirect URL</label>
+        <input type="url" id="authUrl" placeholder="https://yourapp.com/callback" oninput="validateUrl()">
+        <div class="hint">OAuth redirect URI for authentication</div>
+        <div class="error-msg">Must be a valid HTTPS URL</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Affiliate Token <span class="optional">(optional)</span></label>
+        <input type="text" id="affiliateToken" placeholder="e.g. aff_abc123">
+        <div class="hint">For tracking referrals</div>
+      </div>
+      <div class="field">
+        <label>Markup Percentage</label>
+        <div class="markup-wrapper">
+          <input type="number" id="markup" placeholder="0.00" min="0" max="5" step="0.01" oninput="validateMarkup()">
+          <span class="suffix">%</span>
+        </div>
+        <div class="hint">0 – 5% (max two decimal places)</div>
+        <div class="error-msg">Markup cannot exceed 5%</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>App Template</label>
+      <select id="template">
+        <option value="digits-no-charts">Digits (without charts)</option>
+        <option value="digits-charts" disabled>Digits (with charts) — coming soon</option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="goStep(2)">Continue to Customise →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Customise -->
+  <div class="card hidden" id="step2">
+    <h2>Customise your app</h2>
+    <p class="subtitle">Add your branding so the app looks like yours.</p>
+
+    <div class="two-col">
+      <div>
+        <div class="field">
+          <label>Logo</label>
+          <div class="upload-zone" id="uploadZone" onclick="simulateUpload()">
+            <div class="icon" id="uploadIcon">📁</div>
+            <div class="label" id="uploadLabel">Click to upload logo</div>
+            <div class="formats">PNG, JPG, SVG — max 2 MB</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Primary Brand Colour</label>
+          <div class="colour-row">
+            <input type="color" id="brandColour" value="#FF444F" oninput="updatePreview()">
+            <input type="text" id="brandColourHex" value="#FF444F" placeholder="#FF444F" oninput="syncColour()">
+          </div>
+          <div class="hint">Used for buttons, highlights, and accents</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="preview-pane">
+          <div class="preview-title">Live Preview</div>
+          <div class="preview-phone">
+            <div class="phone-header">
+              <div class="phone-logo" id="previewLogo">Logo</div>
+              <div class="phone-title" id="previewTitle">Your Trading App</div>
+            </div>
+            <div class="phone-body">
+              <div style="font-size:10px;color:var(--grey-400);text-align:center;margin-bottom:4px;">DIGITS PREDICTION</div>
+              <div class="phone-digit-row">
+                <div class="digit-box" id="d0" style="background:var(--red)">3</div>
+                <div class="digit-box" id="d1" style="background:var(--red)">7</div>
+                <div class="digit-box" id="d2" style="background:var(--red)">1</div>
+                <div class="digit-box" id="d3" style="background:var(--red)">9</div>
+                <div class="digit-box" id="d4" style="background:var(--red)">5</div>
+              </div>
+              <div class="phone-bar" style="background:var(--grey-200)"></div>
+              <div class="phone-bar phone-bar-short" style="background:var(--grey-200)"></div>
+              <div style="font-size:10px;color:var(--grey-400);margin:12px 0 4px;">Stake</div>
+              <div style="background:var(--grey-100);border-radius:4px;padding:6px 8px;font-size:12px;font-weight:600;">10.00 USD</div>
+              <div class="phone-btn" id="previewBtn" style="background:var(--red)">Trade Now</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Continue to Host & Export →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Host & Export -->
+  <div class="card hidden" id="step3">
+    <h2>Host &amp; Export</h2>
+    <p class="subtitle">Deploy your app live or download the source code.</p>
+
+    <h3 style="font-size:15px;margin-bottom:14px;color:var(--grey-900);">Deploy to hosting provider</h3>
+    <div class="host-grid">
+      <div class="host-card" id="hostNetlify" onclick="selectHost('netlify')">
+        <div class="host-icon">▲</div>
+        <div class="host-name">Netlify</div>
+        <div class="host-desc">Connect your Netlify account and deploy instantly</div>
+      </div>
+      <div class="host-card" id="hostVercel" onclick="selectHost('vercel')">
+        <div class="host-icon">◆</div>
+        <div class="host-name">Vercel</div>
+        <div class="host-desc">Connect your Vercel account and deploy instantly</div>
+      </div>
+    </div>
+
+    <button class="btn btn-deploy" id="deployBtn" disabled onclick="simulateDeploy()">🚀 Deploy App</button>
+
+    <div class="success-banner" id="successBanner">
+      <div class="success-icon">✅</div>
+      <h3>App deployed successfully!</h3>
+      <p style="font-size:14px;color:var(--grey-600);">Your Digits trading app is now live.</p>
+      <div class="url" id="liveUrl">https://your-app.netlify.app</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="export-section">
+      <h3>Export source code</h3>
+      <div style="display:flex;gap:12px;">
+        <button class="btn btn-export" onclick="simulateExport('github')">⬡ Push to GitHub</button>
+        <button class="btn btn-secondary" onclick="simulateExport('zip')">⬇ Download ZIP</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(2)">← Back</button>
+      <span></span>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentStep = 1;
+let selectedHost = null;
+let logoUploaded = false;
+
+function goStep(step) {
+  if (step === 2 && !validateStep1()) return;
+
+  document.getElementById('step1').classList.toggle('hidden', step !== 1);
+  document.getElementById('step2').classList.toggle('hidden', step !== 2);
+  document.getElementById('step3').classList.toggle('hidden', step !== 3);
+
+  for (let i = 1; i <= 3; i++) {
+    const circle = document.getElementById('sc' + i);
+    const label = document.getElementById('sl' + i);
+    circle.classList.remove('active', 'done');
+    label.classList.remove('active', 'done');
+    if (i < step) { circle.classList.add('done'); circle.textContent = '✓'; label.classList.add('done'); }
+    else if (i === step) { circle.classList.add('active'); circle.textContent = i; label.classList.add('active'); }
+    else { circle.textContent = i; }
+  }
+  document.getElementById('line1').classList.toggle('done', step > 1);
+  document.getElementById('line2').classList.toggle('done', step > 2);
+
+  currentStep = step;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateStep1() {
+  let valid = true;
+  const appId = document.getElementById('appId');
+  const authUrl = document.getElementById('authUrl');
+  const markup = document.getElementById('markup');
+
+  if (!appId.value || isNaN(appId.value)) { appId.classList.add('error'); valid = false; } else { appId.classList.remove('error'); }
+  if (!authUrl.value || !authUrl.value.startsWith('https://')) { authUrl.classList.add('error'); valid = false; } else { authUrl.classList.remove('error'); }
+  if (markup.value && (parseFloat(markup.value) > 5 || parseFloat(markup.value) < 0)) { markup.classList.add('error'); valid = false; } else { markup.classList.remove('error'); }
+
+  return valid;
+}
+
+function validateAppId() {
+  const el = document.getElementById('appId');
+  const badge = document.getElementById('appid-badge');
+  if (el.value && !isNaN(el.value) && el.value.length >= 3) {
+    badge.classList.remove('hidden', 'fail');
+    badge.classList.add('ok');
+    badge.textContent = '✓ Valid';
+    el.classList.remove('error');
+  } else if (el.value) {
+    badge.classList.remove('hidden', 'ok');
+    badge.classList.add('fail');
+    badge.textContent = '✗ Invalid';
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+function validateUrl() {
+  const el = document.getElementById('authUrl');
+  if (el.value && !el.value.startsWith('https://')) { el.classList.add('error'); } else { el.classList.remove('error'); }
+}
+
+function validateMarkup() {
+  const el = document.getElementById('markup');
+  const val = parseFloat(el.value);
+  if (el.value && (val > 5 || val < 0)) { el.classList.add('error'); } else { el.classList.remove('error'); }
+}
+
+function simulateUpload() {
+  const zone = document.getElementById('uploadZone');
+  const icon = document.getElementById('uploadIcon');
+  const label = document.getElementById('uploadLabel');
+  zone.classList.add('has-file');
+  icon.textContent = '✓';
+  label.textContent = 'logo.png uploaded';
+  logoUploaded = true;
+  // Simulate logo in preview
+  document.getElementById('previewLogo').innerHTML = '<div style="width:100%;height:100%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:800;">D</div>';
+}
+
+function updatePreview() {
+  const colour = document.getElementById('brandColour').value;
+  document.getElementById('brandColourHex').value = colour;
+  applyPreviewColour(colour);
+}
+
+function syncColour() {
+  const hex = document.getElementById('brandColourHex').value;
+  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+    document.getElementById('brandColour').value = hex;
+    applyPreviewColour(hex);
+  }
+}
+
+function applyPreviewColour(colour) {
+  document.querySelectorAll('.digit-box').forEach(el => el.style.background = colour);
+  document.getElementById('previewBtn').style.background = colour;
+}
+
+function selectHost(host) {
+  selectedHost = host;
+  document.getElementById('hostNetlify').classList.toggle('selected', host === 'netlify');
+  document.getElementById('hostVercel').classList.toggle('selected', host === 'vercel');
+  document.getElementById('deployBtn').disabled = false;
+}
+
+function simulateDeploy() {
+  const btn = document.getElementById('deployBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Deploying...';
+
+  setTimeout(() => {
+    btn.textContent = '✅ Deployed!';
+    const banner = document.getElementById('successBanner');
+    banner.style.display = 'block';
+    const appId = document.getElementById('appId').value || 'my-app';
+    const host = selectedHost === 'netlify' ? 'netlify.app' : 'vercel.app';
+    document.getElementById('liveUrl').textContent = 'https://digits-' + appId + '.' + host;
+  }, 2000);
+}
+
+function simulateExport(type) {
+  if (type === 'github') {
+    alert('Prototype: This would open GitHub OAuth and push to a new repository.');
+  } else {
+    alert('Prototype: This would download digits-app-source.zip (HTML/CSS/JS + README).');
+  }
+}
+</script>
+
+</body>
+</html>
