@@ -120,24 +120,59 @@
   .ph-btn { margin: 14px auto 0; width: 75%; padding: 6px; border-radius: 5px; text-align: center; color: #fff; font-size: 10px; font-weight: 700; }
 
   /* === STEP 3: Host & Export === */
-  .deploy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  @media (max-width: 400px) { .deploy-grid { grid-template-columns: 1fr; } }
-  .d-card { border: 1.5px solid var(--g2); border-radius: var(--radius); padding: 18px 14px; text-align: center; cursor: pointer; transition: all .2s; background: #fff; }
-  .d-card:hover { border-color: var(--red); }
-  .d-card.on { border-color: var(--red); background: #FFF5F5; }
-  .d-card .d-icon { font-size: 22px; margin-bottom: 4px; }
-  .d-card .d-name { font-size: 14px; font-weight: 700; }
-  .d-card .d-desc { font-size: 11px; color: var(--g7); margin-top: 2px; }
-  .success { background: #F0FFF0; border: 1px solid #C8E6C9; border-radius: var(--radius); padding: 20px; text-align: center; display: none; margin-top: 14px; }
-  .success .s-icon { font-size: 36px; margin-bottom: 8px; }
-  .success h4 { color: var(--green); font-size: 15px; margin-bottom: 4px; }
-  .success .live-url { font-family: 'IBM Plex Mono', monospace; background: #fff; padding: 6px 14px; border-radius: 4px; display: inline-block; margin-top: 6px; font-size: 12px; border: 1px solid var(--g2); }
+  .s3-section { margin-bottom: 20px; }
+  .s3-section-title { font-size: 14px; font-weight: 700; color: var(--g9); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .s3-section-title .s3-num { width: 20px; height: 20px; border-radius: 50%; background: var(--g9); color: #fff; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .host-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  @media (max-width: 520px) { .host-grid { grid-template-columns: 1fr; } }
 
-  .sep { border: none; border-top: 1px solid var(--g2); margin: 20px 0; }
+  .h-opt { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--g2); border-radius: var(--radius-sm); cursor: pointer; transition: all .2s; background: #fff; }
+  .h-opt:hover { border-color: var(--red); }
+  .h-opt.on { border-color: var(--red); background: #FFF5F5; }
+  .h-opt .h-radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--g3); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  .h-opt.on .h-radio { border-color: var(--red); }
+  .h-opt.on .h-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+  .h-opt .h-icon { font-size: 16px; flex-shrink: 0; }
+  .h-opt .h-label { font-size: 13px; font-weight: 600; color: var(--g9); }
+  .h-opt .h-sub { font-size: 11px; color: var(--g7); }
 
-  /* Self-host URL section */
-  .self-host-section { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--g2); }
-  .self-host-section.show { display: block; }
+  /* Deploy button */
+  .deploy-row { margin-top: 12px; }
+
+  /* Export action buttons */
+  .export-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .exp-btn { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border: 1.5px solid var(--g2); border-radius: var(--radius-sm); cursor: pointer; transition: all .2s; background: #fff; font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--g9); }
+  .exp-btn:hover { border-color: var(--g9); background: var(--g1); }
+  .exp-btn .exp-icon { font-size: 16px; flex-shrink: 0; }
+  .exp-btn .exp-sub { font-size: 11px; font-weight: 400; color: var(--g7); }
+  .exp-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .exp-btn.loading { pointer-events: none; opacity: .7; }
+  .exp-btn.done { border-color: var(--green); background: #F0FFF0; }
+
+  /* GitHub inline flow */
+  .gh-flow { display: none; margin-top: 12px; padding: 14px; background: var(--g1); border-radius: var(--radius); border: 1px solid var(--g2); }
+  .gh-flow.show { display: block; }
+  .gh-flow .gh-step { font-size: 12px; color: var(--g7); margin-bottom: 8px; }
+  .gh-flow .gh-step strong { color: var(--g9); }
+  .gh-repo-input { display: flex; gap: 6px; align-items: center; }
+  .gh-repo-input input { flex: 1; }
+  .gh-repo-input .btn { flex-shrink: 0; }
+
+  /* Toast / inline feedback */
+  .exp-toast { display: none; margin-top: 10px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; align-items: center; gap: 6px; }
+  .exp-toast.show { display: flex; }
+  .exp-toast.success { background: #F0FFF0; border: 1px solid #C8E6C9; color: #2E7D32; }
+  .exp-toast.info { background: var(--info-bg); border: 1px solid var(--info-border); color: #1565C0; }
+
+  /* Self-host URL config */
+  .url-config { display: none; margin-top: 14px; padding: 14px; background: var(--g1); border-radius: var(--radius); border: 1px solid var(--g2); }
+  .url-config.show { display: block; }
+
+  /* Success */
+  .success { background: #F0FFF0; border: 1px solid #C8E6C9; border-radius: var(--radius); padding: 16px; text-align: center; display: none; margin-top: 14px; }
+  .success .s-icon { font-size: 32px; margin-bottom: 6px; }
+  .success h4 { color: var(--green); font-size: 14px; margin-bottom: 4px; }
+  .success .live-url { font-family: 'IBM Plex Mono', monospace; background: #fff; padding: 5px 12px; border-radius: 4px; display: inline-block; margin-top: 4px; font-size: 12px; border: 1px solid var(--g2); }
 
   /* === BUTTONS === */
   .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 10px; }
@@ -308,62 +343,82 @@
   <!-- ==================== STEP 3: HOST & EXPORT ==================== -->
   <div class="card hidden" id="step3">
     <div class="card-title">Host & Export</div>
-    <div class="card-sub">Deploy your app live or download the source code.</div>
+    <div class="card-sub">Choose how to host your app and how to get the source code. These are independent — you can do either or both.</div>
 
-    <!-- Deploy -->
-    <div class="sect" style="margin-top:0;">Deploy to a hosting provider</div>
-    <div class="deploy-grid">
-      <div class="d-card" id="hNet" onclick="pickHost('netlify')">
-        <div class="d-icon">▲</div>
-        <div class="d-name">Netlify</div>
-        <div class="d-desc">One-click deploy to Netlify</div>
-      </div>
-      <div class="d-card" id="hVer" onclick="pickHost('vercel')">
-        <div class="d-icon">◆</div>
-        <div class="d-name">Vercel</div>
-        <div class="d-desc">One-click deploy to Vercel</div>
-      </div>
-    </div>
-    <div class="info" style="margin-bottom:12px;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#2684FC" stroke-width="1.5"/><path d="M8 7v4M8 5h.01" stroke="#2684FC" stroke-width="1.5" stroke-linecap="round"/></svg> Redirect URL will be configured automatically from your deploy domain.</div>
-    <button class="btn btn-deploy" id="deployBtn" disabled onclick="simDeploy()">🚀 Deploy App</button>
-    <div class="success" id="successBox">
-      <div class="s-icon">✅</div>
-      <h4>App deployed successfully!</h4>
-      <p style="font-size:12px;color:var(--g7);">Your Digits trading app is now live.</p>
-      <div class="live-url" id="liveUrl">https://digits-app.netlify.app</div>
-    </div>
-
-    <hr class="sep">
-
-    <!-- Export -->
-    <div class="sect">Export source code</div>
-    <div class="deploy-grid">
-      <div class="d-card" onclick="pickExport('self')">
-        <div class="d-icon">🖥</div>
-        <div class="d-name">Self-host</div>
-        <div class="d-desc">I'll host it on my own server</div>
-      </div>
-      <div class="d-card" onclick="simExport('zip')">
-        <div class="d-icon">⬇</div>
-        <div class="d-name">Download ZIP</div>
-        <div class="d-desc">Get the full source code</div>
-      </div>
-    </div>
-
-    <!-- Self-host: URL config appears here -->
-    <div class="self-host-section" id="selfHostSection">
-      <div class="info"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#2684FC" stroke-width="1.5"/><path d="M8 7v4M8 5h.01" stroke="#2684FC" stroke-width="1.5" stroke-linecap="round"/></svg> Since you're self-hosting, provide your redirect URL for OAuth to work.</div>
-      <div class="sect" style="margin-top:10px;">URL Configuration <span class="tip">i</span></div>
-      <div id="urlBox">
-        <div class="url-row">
-          <input type="url" placeholder="Redirect URL 1" id="selfUrl">
-          <button class="url-btn" onclick="addUrl()" title="Add URL">+</button>
+    <!-- HOST SECTION -->
+    <div class="s3-section">
+      <div class="s3-section-title"><span class="s3-num">1</span> Host your app</div>
+      <div class="host-grid">
+        <div class="h-opt" id="hNet" onclick="pickHost('netlify')">
+          <div class="h-radio"></div>
+          <div class="h-icon">▲</div>
+          <div><div class="h-label">Netlify</div><div class="h-sub">Auto-configured redirect URL</div></div>
+        </div>
+        <div class="h-opt" id="hVer" onclick="pickHost('vercel')">
+          <div class="h-radio"></div>
+          <div class="h-icon">◆</div>
+          <div><div class="h-label">Vercel</div><div class="h-sub">Auto-configured redirect URL</div></div>
+        </div>
+        <div class="h-opt" id="hSelf" onclick="pickHost('self')">
+          <div class="h-radio"></div>
+          <div class="h-icon">🖥</div>
+          <div><div class="h-label">Self-host</div><div class="h-sub">You provide the redirect URL</div></div>
         </div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:12px;">
-        <button class="btn btn-dark" onclick="simExport('github')">⬡ Push to GitHub</button>
-        <button class="btn btn-s" onclick="simExport('zip')">⬇ Download ZIP</button>
+
+      <!-- Self-host URL config -->
+      <div class="url-config" id="urlConfig">
+        <div class="info" style="margin-bottom:10px;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#2684FC" stroke-width="1.5"/><path d="M8 7v4M8 5h.01" stroke="#2684FC" stroke-width="1.5" stroke-linecap="round"/></svg> Provide your redirect URL for OAuth to work.</div>
+        <div id="urlBox">
+          <div class="url-row"><input type="url" placeholder="Redirect URL 1" id="selfUrl"><button class="url-btn" onclick="addUrl()" title="Add URL">+</button></div>
+        </div>
       </div>
+
+      <!-- Deploy button + success -->
+      <div class="deploy-row">
+        <button class="btn btn-deploy" id="deployBtn" disabled onclick="simDeploy()">🚀 Deploy to <span id="deployTarget">—</span></button>
+      </div>
+      <div class="success" id="successBox">
+        <div class="s-icon">✅</div>
+        <h4>App deployed successfully!</h4>
+        <p style="font-size:12px;color:var(--g7);">Your Digits trading app is now live.</p>
+        <div class="live-url" id="liveUrl">https://digits-app.netlify.app</div>
+      </div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--g2);margin:4px 0 20px;">
+
+    <!-- EXPORT SECTION -->
+    <div class="s3-section">
+      <div class="s3-section-title"><span class="s3-num">2</span> Get source code</div>
+      <div style="font-size:12px;color:var(--g5);margin:-6px 0 12px;">Your full source code — independent of hosting choice.</div>
+      <div class="export-actions">
+        <button class="exp-btn" id="ghBtn" onclick="startGitHub()">
+          <span class="exp-icon">⬡</span>
+          <div><div>Push to GitHub</div><div class="exp-sub">Creates a new repo with your code</div></div>
+        </button>
+        <button class="exp-btn" id="zipBtn" onclick="startZip()">
+          <span class="exp-icon">⬇</span>
+          <div><div>Download ZIP</div><div class="exp-sub">Full source with README</div></div>
+        </button>
+      </div>
+
+      <!-- GitHub inline flow -->
+      <div class="gh-flow" id="ghFlow">
+        <div class="gh-step"><strong>Step 1:</strong> Connect your GitHub account</div>
+        <button class="btn btn-dark" id="ghConnectBtn" onclick="simGhConnect()" style="margin-bottom:12px;font-size:12px;height:34px;">🔗 Connect GitHub</button>
+        <div id="ghStep2" style="display:none;">
+          <div class="gh-step"><strong>Step 2:</strong> Choose a repository name</div>
+          <div class="gh-repo-input">
+            <input type="text" id="ghRepoName" placeholder="my-digits-app">
+            <button class="btn btn-p" onclick="simGhPush()" style="font-size:12px;height:38px;">Push</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback toasts -->
+      <div class="exp-toast" id="ghToast"></div>
+      <div class="exp-toast" id="zipToast"></div>
     </div>
 
     <div class="btn-row">
@@ -435,31 +490,85 @@ function pickHost(h) {
   host = h;
   document.getElementById('hNet').classList.toggle('on', h === 'netlify');
   document.getElementById('hVer').classList.toggle('on', h === 'vercel');
-  document.getElementById('deployBtn').disabled = false;
-  document.getElementById('selfHostSection').classList.remove('show');
+  document.getElementById('hSelf').classList.toggle('on', h === 'self');
+  document.getElementById('urlConfig').classList.toggle('show', h === 'self');
+  const db = document.getElementById('deployBtn');
+  const dt = document.getElementById('deployTarget');
+  if (h === 'self') {
+    db.style.display = 'none';
+  } else {
+    db.style.display = 'inline-flex';
+    db.disabled = false;
+    dt.textContent = h === 'netlify' ? 'Netlify' : 'Vercel';
+  }
 }
+
 function simDeploy() {
-  const b = document.getElementById('deployBtn'); b.disabled = true; b.textContent = '⏳ Deploying...';
+  const b = document.getElementById('deployBtn'); b.disabled = true;
+  b.innerHTML = '⏳ Deploying to ' + (host === 'netlify' ? 'Netlify' : 'Vercel') + '...';
   setTimeout(() => {
-    b.textContent = '✅ Deployed!';
+    b.innerHTML = '✅ Deployed!'; b.style.background = 'var(--green)';
     const box = document.getElementById('successBox'); box.style.display = 'block';
     const name = (document.getElementById('appName').value || 'my-app').toLowerCase().replace(/[^a-z0-9]/g,'-');
     const dom = host === 'netlify' ? 'netlify.app' : 'vercel.app';
     document.getElementById('liveUrl').textContent = 'https://' + name + '.' + dom;
   }, 1800);
 }
-function pickExport(type) {
-  if (type === 'self') {
-    document.getElementById('selfHostSection').classList.add('show');
-    document.getElementById('hNet').classList.remove('on');
-    document.getElementById('hVer').classList.remove('on');
-    host = null; document.getElementById('deployBtn').disabled = true;
-  }
+
+// Export: Push to GitHub (inline flow)
+function startGitHub() {
+  // Toggle flow visibility
+  const flow = document.getElementById('ghFlow');
+  if (flow.classList.contains('show')) { flow.classList.remove('show'); return; }
+  flow.classList.add('show');
+  // Reset state
+  document.getElementById('ghConnectBtn').disabled = false;
+  document.getElementById('ghConnectBtn').innerHTML = '🔗 Connect GitHub';
+  document.getElementById('ghStep2').style.display = 'none';
+  hideToast('ghToast');
+  // Pre-fill repo name from app name
+  const name = (document.getElementById('appName').value || 'my-digits-app').toLowerCase().replace(/[^a-z0-9]/g,'-');
+  document.getElementById('ghRepoName').value = name;
 }
-function simExport(type) {
-  if (type === 'github') alert('Prototype: Opens GitHub OAuth → pushes to a new repository.');
-  else alert('Prototype: Downloads digits-app-source.zip');
+
+function simGhConnect() {
+  const btn = document.getElementById('ghConnectBtn');
+  btn.disabled = true; btn.innerHTML = '⏳ Connecting...';
+  setTimeout(() => {
+    btn.innerHTML = '✅ Connected as <strong style="margin-left:4px;">your-username</strong>';
+    btn.style.background = 'var(--green)'; btn.style.color = '#fff'; btn.style.border = 'none';
+    document.getElementById('ghStep2').style.display = 'block';
+  }, 1200);
 }
+
+function simGhPush() {
+  const repo = document.getElementById('ghRepoName').value || 'my-digits-app';
+  showToast('ghToast', 'success', '✅ Pushed! Repository created at <strong>github.com/your-username/' + repo + '</strong>');
+  document.getElementById('ghBtn').classList.add('done');
+  document.getElementById('ghFlow').classList.remove('show');
+}
+
+// Export: Download ZIP (instant action)
+function startZip() {
+  const btn = document.getElementById('zipBtn');
+  btn.classList.add('loading');
+  btn.querySelector('div > div:first-child').textContent = 'Downloading...';
+  setTimeout(() => {
+    btn.classList.remove('loading'); btn.classList.add('done');
+    btn.querySelector('div > div:first-child').textContent = 'Download ZIP';
+    showToast('zipToast', 'success', '✅ Downloaded <strong>digits-app-source.zip</strong> — check your downloads folder.');
+  }, 1000);
+}
+
+function showToast(id, type, html) {
+  const t = document.getElementById(id);
+  t.className = 'exp-toast show ' + type;
+  t.innerHTML = html;
+}
+function hideToast(id) {
+  document.getElementById(id).className = 'exp-toast';
+}
+
 function addUrl() {
   urlN++;
   const row = document.createElement('div'); row.className = 'url-row';
