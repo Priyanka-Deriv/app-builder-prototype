@@ -3,304 +3,296 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>App Builder — Deriv API Dashboard (Prototype)</title>
+<title>App Builder — Deriv API Dashboard</title>
 <style>
   :root {
-    --red: #FF444F;
-    --red-dark: #E03842;
-    --dark: #0E0E0E;
-    --grey-900: #333333;
-    --grey-600: #666666;
-    --grey-400: #999999;
-    --grey-200: #E0E0E0;
-    --grey-100: #F5F5F5;
-    --white: #FFFFFF;
-    --green: #4BB543;
-    --blue: #2196F3;
-    --orange: #FF9800;
-    --radius: 8px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+    --red: #FF444F; --red-dark: #D93640; --dark: #0E0E0E; --g9: #232323; --g7: #555; --g5: #888; --g3: #C6C6C6; --g2: #E0E0E0; --g1: #F2F3F4;
+    --white: #FFFFFF; --green: #4BB543; --blue: #2684FC; --info-bg: #EBF4FF; --info-border: #B3D4FC;
+    --radius: 8px; --radius-sm: 6px; --shadow: 0 1px 8px rgba(0,0,0,0.06); --font: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--grey-100); color: var(--grey-900); min-height: 100vh; }
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--g1); color: var(--g9); min-height: 100vh; font-size: 14px; line-height: 1.5; }
 
-  /* Top nav */
-  .topbar { background: var(--dark); padding: 14px 32px; display: flex; align-items: center; gap: 16px; }
-  .topbar .logo { color: var(--red); font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
-  .topbar .sep { color: var(--grey-600); font-size: 20px; }
-  .topbar .section-title { color: var(--grey-400); font-size: 14px; font-weight: 500; }
-  .topbar .badge { background: var(--red); color: var(--white); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  /* === NAV === */
+  .topbar { background: var(--dark); padding: 0 24px; height: 48px; display: flex; align-items: center; gap: 12px; }
+  .topbar .logo { color: var(--red); font-weight: 700; font-size: 17px; }
+  .topbar .divider { width: 1px; height: 20px; background: #333; }
+  .topbar .nav-text { color: var(--g5); font-size: 13px; font-weight: 500; }
+  .topbar .nav-text.active { color: #fff; }
+  .topbar .badge { background: var(--red); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 8px; text-transform: uppercase; letter-spacing: .4px; margin-left: 4px; }
+  .proto-ribbon { background: #FF9800; color: #fff; text-align: center; font-size: 11px; font-weight: 700; padding: 4px; letter-spacing: .5px; }
 
-  /* Layout */
-  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+  /* === LAYOUT === */
+  .shell { max-width: 640px; margin: 0 auto; padding: 28px 16px 48px; }
+  @media (min-width: 768px) { .shell { padding: 32px 0 56px; } }
 
-  /* Progress stepper */
-  .stepper { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 40px; }
-  .step-item { display: flex; align-items: center; gap: 0; }
-  .step-circle {
-    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; border: 2px solid var(--grey-200); color: var(--grey-400); background: var(--white);
-    transition: all 0.3s ease; flex-shrink: 0;
-  }
-  .step-circle.active { border-color: var(--red); color: var(--white); background: var(--red); }
-  .step-circle.done { border-color: var(--green); color: var(--white); background: var(--green); }
-  .step-label { font-size: 13px; color: var(--grey-400); margin-left: 8px; font-weight: 500; white-space: nowrap; transition: color 0.3s; }
-  .step-label.active { color: var(--grey-900); font-weight: 600; }
-  .step-label.done { color: var(--green); }
-  .step-line { width: 80px; height: 2px; background: var(--grey-200); margin: 0 12px; transition: background 0.3s; }
-  .step-line.done { background: var(--green); }
+  /* === STEPPER === */
+  .stepper { display: flex; align-items: center; justify-content: center; margin-bottom: 28px; }
+  .s-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--g2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--g5); background: #fff; transition: all .25s; flex-shrink: 0; }
+  .s-dot.on { border-color: var(--red); background: var(--red); color: #fff; }
+  .s-dot.done { border-color: var(--green); background: var(--green); color: #fff; }
+  .s-lbl { font-size: 12px; color: var(--g5); margin-left: 6px; font-weight: 500; transition: color .25s; white-space: nowrap; }
+  .s-lbl.on { color: var(--g9); font-weight: 600; }
+  .s-lbl.done { color: var(--green); }
+  .s-line { width: 48px; height: 2px; background: var(--g2); margin: 0 10px; transition: background .25s; flex-shrink: 0; }
+  .s-line.done { background: var(--green); }
+  .s-step { display: flex; align-items: center; }
 
-  /* Card */
-  .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px; }
-  .card h2 { font-size: 22px; color: var(--grey-900); margin-bottom: 6px; }
-  .card .subtitle { font-size: 14px; color: var(--grey-600); margin-bottom: 28px; }
+  /* === CARD === */
+  .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px 24px; }
+  @media (max-width: 480px) { .card { padding: 20px 16px; } }
+  .card-title { font-size: 18px; font-weight: 700; color: var(--g9); margin-bottom: 2px; }
+  .card-sub { font-size: 13px; color: var(--g5); margin-bottom: 24px; }
 
-  /* Form fields */
-  .field { margin-bottom: 22px; }
-  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--grey-900); margin-bottom: 6px; }
-  .field label .optional { color: var(--grey-400); font-weight: 400; }
-  .field input, .field select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--grey-200); border-radius: 6px; font-size: 14px; color: var(--grey-900); background: var(--white); outline: none; transition: border-color 0.2s; }
-  .field input:focus, .field select:focus { border-color: var(--red); }
-  .field input.error { border-color: var(--red); background: #FFF5F5; }
-  .field .hint { font-size: 12px; color: var(--grey-400); margin-top: 4px; }
-  .field .error-msg { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
-  .field input.error + .hint { display: none; }
-  .field input.error ~ .error-msg { display: block; }
+  /* === FORM === */
+  .sect { font-size: 14px; font-weight: 700; color: var(--g9); margin: 24px 0 8px; display: flex; align-items: center; gap: 5px; }
+  .sect:first-of-type { margin-top: 0; }
+  .tip { width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid var(--g3); display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: var(--g5); cursor: help; flex-shrink: 0; }
+  .info { background: var(--info-bg); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 12px; color: var(--g7); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .info svg { flex-shrink: 0; }
 
-  /* Markup special */
-  .markup-wrapper { position: relative; }
-  .markup-wrapper input { padding-right: 36px; }
-  .markup-wrapper .suffix { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--grey-400); font-size: 14px; pointer-events: none; }
+  .fld { margin-bottom: 14px; }
+  .fld label { display: block; font-size: 12px; font-weight: 600; color: var(--g7); margin-bottom: 4px; }
+  .fld label .opt { font-weight: 400; color: var(--g5); }
+  input[type="text"], input[type="url"], input[type="number"], select { width: 100%; height: 38px; padding: 0 12px; border: 1.5px solid var(--g2); border-radius: var(--radius-sm); font-size: 13px; font-family: var(--font); color: var(--g9); background: #fff; outline: none; transition: border-color .2s; }
+  input:focus, select:focus { border-color: var(--red); }
+  input.err { border-color: var(--red); background: #FFF5F5; }
+  .hint { font-size: 11px; color: var(--g5); margin-top: 3px; }
+  .err-msg { font-size: 11px; color: var(--red); margin-top: 3px; display: none; }
+  .rules { list-style: disc; margin: 4px 0 0 16px; font-size: 11px; color: var(--g5); }
+  .rules li { margin-bottom: 1px; }
 
-  /* Two-col layout */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  /* Markup stepper */
+  .mk-wrap { display: flex; align-items: center; border: 1.5px solid var(--g2); border-radius: var(--radius-sm); width: fit-content; overflow: hidden; }
+  .mk-wrap button { width: 36px; height: 36px; border: none; background: #fff; font-size: 16px; color: var(--g7); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .mk-wrap button:hover { background: var(--g1); }
+  .mk-wrap input { width: 60px; height: 36px; border: none; border-left: 1.5px solid var(--g2); border-right: 1.5px solid var(--g2); text-align: center; font-size: 13px; font-weight: 600; font-family: var(--font); color: var(--g9); outline: none; }
+  .mk-wrap .unit { padding: 0 10px; font-size: 12px; color: var(--g5); border-left: 1.5px solid var(--g2); display: flex; align-items: center; height: 36px; }
 
-  /* Upload zone */
-  .upload-zone {
-    border: 2px dashed var(--grey-200); border-radius: var(--radius); padding: 32px; text-align: center;
-    cursor: pointer; transition: all 0.2s; background: var(--grey-100);
-  }
-  .upload-zone:hover { border-color: var(--red); background: #FFF5F5; }
-  .upload-zone .icon { font-size: 32px; margin-bottom: 8px; }
-  .upload-zone .label { font-size: 14px; color: var(--grey-600); }
-  .upload-zone .formats { font-size: 11px; color: var(--grey-400); margin-top: 4px; }
-  .upload-zone.has-file { border-color: var(--green); border-style: solid; background: #F0FFF0; }
-  .upload-zone.has-file .icon::before { content: "✓"; }
+  /* Scope checkboxes — compact inline pills */
+  .scope-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .scope { display: flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1.5px solid var(--g2); border-radius: 20px; cursor: pointer; transition: all .2s; font-size: 12px; font-weight: 500; color: var(--g7); background: #fff; user-select: none; }
+  .scope:hover { border-color: var(--red); }
+  .scope.on { border-color: var(--red); background: #FFF5F5; color: var(--g9); font-weight: 600; }
+  .scope input[type="checkbox"] { accent-color: var(--red); width: 14px; height: 14px; flex-shrink: 0; margin: 0; }
 
-  /* Colour picker row */
-  .colour-row { display: flex; align-items: center; gap: 12px; }
-  .colour-row input[type="color"] { width: 48px; height: 40px; border: 1.5px solid var(--grey-200); border-radius: 6px; cursor: pointer; padding: 2px; }
+  /* Scope tooltip on hover */
+  .scope-wrap { position: relative; display: inline-flex; }
+  .scope-tooltip { display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--g9); color: #fff; font-size: 11px; font-weight: 400; padding: 6px 10px; border-radius: 4px; white-space: nowrap; z-index: 10; pointer-events: none; }
+  .scope-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-top-color: var(--g9); }
+  .scope-wrap:hover .scope-tooltip { display: block; }
+
+  /* URL rows */
+  .url-row { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .url-row input { flex: 1; }
+  .url-btn { width: 38px; height: 38px; border-radius: var(--radius-sm); border: 1.5px solid var(--g2); background: #fff; font-size: 18px; color: var(--g7); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .url-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* T&C */
+  .tc { display: flex; align-items: flex-start; gap: 8px; margin-top: 20px; font-size: 12px; color: var(--g7); line-height: 1.5; }
+  .tc input[type="checkbox"] { margin-top: 2px; accent-color: var(--red); width: 15px; height: 15px; flex-shrink: 0; }
+  .tc a { color: var(--red); }
+
+  /* === CUSTOMISE: Upload + Colour === */
+  .upload { border: 2px dashed var(--g2); border-radius: var(--radius); padding: 24px; text-align: center; cursor: pointer; transition: all .2s; background: var(--g1); }
+  .upload:hover { border-color: var(--red); background: #FFF5F5; }
+  .upload.ok { border-color: var(--green); border-style: solid; background: #F0FFF0; }
+  .upload .u-icon { font-size: 24px; margin-bottom: 4px; }
+  .upload .u-label { font-size: 13px; color: var(--g7); }
+  .upload .u-fmt { font-size: 10px; color: var(--g5); margin-top: 2px; }
+  .colour-row { display: flex; gap: 10px; align-items: center; }
+  .colour-row input[type="color"] { width: 38px; height: 38px; border: 1.5px solid var(--g2); border-radius: var(--radius-sm); cursor: pointer; padding: 2px; }
   .colour-row input[type="text"] { flex: 1; }
 
-  /* Preview pane */
-  .preview-pane {
-    background: var(--grey-100); border-radius: var(--radius); padding: 20px; margin-top: 24px;
-    border: 1px solid var(--grey-200);
-  }
-  .preview-pane .preview-title { font-size: 12px; font-weight: 600; color: var(--grey-400); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-  .preview-phone {
-    width: 240px; height: 420px; background: var(--white); border-radius: 20px; margin: 0 auto;
-    box-shadow: var(--shadow-lg); overflow: hidden; position: relative;
-    border: 2px solid var(--grey-200);
-  }
-  .preview-phone .phone-header { padding: 16px; text-align: center; }
-  .preview-phone .phone-header .phone-logo { width: 40px; height: 40px; border-radius: 8px; background: var(--grey-200); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--grey-400); overflow: hidden; }
-  .preview-phone .phone-header .phone-logo img { width: 100%; height: 100%; object-fit: contain; }
-  .preview-phone .phone-title { font-size: 12px; font-weight: 700; }
-  .preview-phone .phone-body { padding: 0 16px; }
-  .preview-phone .phone-digit-row { display: flex; justify-content: center; gap: 6px; margin: 12px 0; }
-  .preview-phone .digit-box { width: 32px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: var(--white); }
-  .preview-phone .phone-bar { height: 6px; background: var(--grey-200); border-radius: 3px; margin: 8px 0; }
-  .preview-phone .phone-bar-short { width: 60%; }
-  .preview-phone .phone-btn { margin: 16px auto; width: 80%; padding: 8px; border-radius: 6px; text-align: center; color: var(--white); font-size: 11px; font-weight: 700; }
+  /* Preview */
+  .preview-box { background: var(--g1); border: 1px solid var(--g2); border-radius: var(--radius); padding: 16px; margin-top: 16px; }
+  .preview-label { font-size: 10px; font-weight: 700; color: var(--g5); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+  .phone { width: 200px; height: 360px; background: #fff; border-radius: 18px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,.08); overflow: hidden; border: 2px solid var(--g2); }
+  .ph-head { padding: 12px 14px 8px; text-align: center; }
+  .ph-logo { width: 32px; height: 32px; border-radius: 6px; background: var(--g2); margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: var(--g5); overflow: hidden; }
+  .ph-name { font-size: 10px; font-weight: 700; }
+  .ph-body { padding: 0 14px; }
+  .ph-digits { display: flex; justify-content: center; gap: 4px; margin: 8px 0; }
+  .ph-d { width: 26px; height: 34px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: #fff; }
+  .ph-bar { height: 5px; background: var(--g2); border-radius: 3px; margin: 6px 0; }
+  .ph-bar-s { width: 55%; }
+  .ph-btn { margin: 14px auto 0; width: 75%; padding: 6px; border-radius: 5px; text-align: center; color: #fff; font-size: 10px; font-weight: 700; }
 
-  /* Hosting options */
-  .host-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-  .host-card {
-    border: 2px solid var(--grey-200); border-radius: var(--radius); padding: 24px; text-align: center;
-    cursor: pointer; transition: all 0.2s; background: var(--white);
-  }
-  .host-card:hover { border-color: var(--red); box-shadow: var(--shadow); }
-  .host-card.selected { border-color: var(--red); background: #FFF5F5; }
-  .host-card .host-icon { font-size: 28px; margin-bottom: 8px; }
-  .host-card .host-name { font-size: 16px; font-weight: 700; color: var(--grey-900); }
-  .host-card .host-desc { font-size: 12px; color: var(--grey-600); margin-top: 4px; }
+  /* === STEP 3: Host & Export === */
+  .deploy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 400px) { .deploy-grid { grid-template-columns: 1fr; } }
+  .d-card { border: 1.5px solid var(--g2); border-radius: var(--radius); padding: 18px 14px; text-align: center; cursor: pointer; transition: all .2s; background: #fff; }
+  .d-card:hover { border-color: var(--red); }
+  .d-card.on { border-color: var(--red); background: #FFF5F5; }
+  .d-card .d-icon { font-size: 22px; margin-bottom: 4px; }
+  .d-card .d-name { font-size: 14px; font-weight: 700; }
+  .d-card .d-desc { font-size: 11px; color: var(--g7); margin-top: 2px; }
+  .success { background: #F0FFF0; border: 1px solid #C8E6C9; border-radius: var(--radius); padding: 20px; text-align: center; display: none; margin-top: 14px; }
+  .success .s-icon { font-size: 36px; margin-bottom: 8px; }
+  .success h4 { color: var(--green); font-size: 15px; margin-bottom: 4px; }
+  .success .live-url { font-family: 'IBM Plex Mono', monospace; background: #fff; padding: 6px 14px; border-radius: 4px; display: inline-block; margin-top: 6px; font-size: 12px; border: 1px solid var(--g2); }
 
-  .divider { border: none; border-top: 1px solid var(--grey-200); margin: 28px 0; }
-  .export-section h3 { font-size: 16px; margin-bottom: 16px; color: var(--grey-900); }
+  .sep { border: none; border-top: 1px solid var(--g2); margin: 20px 0; }
 
-  /* Buttons */
-  .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }
-  .btn { padding: 11px 28px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
-  .btn-primary { background: var(--red); color: var(--white); }
-  .btn-primary:hover { background: var(--red-dark); }
-  .btn-secondary { background: var(--white); color: var(--grey-900); border: 1.5px solid var(--grey-200); }
-  .btn-secondary:hover { border-color: var(--grey-400); }
-  .btn-ghost { background: none; color: var(--grey-600); border: none; }
-  .btn-ghost:hover { color: var(--grey-900); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-deploy { background: var(--blue); color: var(--white); padding: 12px 32px; font-size: 15px; }
-  .btn-deploy:hover { background: #1976D2; }
-  .btn-export { background: var(--grey-900); color: var(--white); }
-  .btn-export:hover { background: #111; }
+  /* Self-host URL section */
+  .self-host-section { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--g2); }
+  .self-host-section.show { display: block; }
 
-  /* Success state */
-  .success-banner {
-    background: #F0FFF0; border: 1px solid #C8E6C9; border-radius: var(--radius);
-    padding: 24px; text-align: center; display: none;
-  }
-  .success-banner .success-icon { font-size: 48px; margin-bottom: 12px; }
-  .success-banner h3 { color: var(--green); margin-bottom: 8px; }
-  .success-banner .url { font-family: monospace; background: var(--white); padding: 8px 16px; border-radius: 4px; display: inline-block; margin-top: 8px; font-size: 13px; border: 1px solid var(--grey-200); }
-
-  /* Validation tooltip */
-  .valid-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; font-weight: 600; vertical-align: middle; }
-  .valid-badge.ok { background: #E8F5E9; color: #2E7D32; }
-  .valid-badge.fail { background: #FFEBEE; color: #C62828; }
-
-  /* Prototype label */
-  .proto-banner { background: var(--orange); color: var(--white); text-align: center; font-size: 12px; font-weight: 700; padding: 6px; letter-spacing: 0.5px; }
-
+  /* === BUTTONS === */
+  .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 10px; }
+  .btn { height: 38px; padding: 0 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; font-family: var(--font); cursor: pointer; border: none; transition: all .15s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-p { background: var(--red); color: #fff; }
+  .btn-p:hover { background: var(--red-dark); }
+  .btn-s { background: #fff; color: var(--g9); border: 1.5px solid var(--g2); }
+  .btn-s:hover { border-color: var(--g5); }
+  .btn-deploy { background: var(--blue); color: #fff; height: 40px; padding: 0 24px; font-size: 14px; }
+  .btn-deploy:hover { background: #1A6FE0; }
+  .btn-dark { background: var(--g9); color: #fff; }
+  .btn-dark:hover { background: #111; }
+  .btn:disabled { opacity: .35; cursor: not-allowed; }
   .hidden { display: none !important; }
 
-  /* Info callout */
-  .callout { background: #FFF8E1; border-left: 3px solid var(--orange); padding: 12px 16px; border-radius: 0 6px 6px 0; margin-bottom: 24px; font-size: 13px; color: var(--grey-600); }
+  /* Two-col responsive */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 520px) { .two-col { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<div class="proto-banner">REFERENCE PROTOTYPE — App Builder v1 (Digits Phase 1)</div>
+<div class="proto-ribbon">REFERENCE PROTOTYPE — App Builder v1 · Digits Phase 1</div>
 
 <div class="topbar">
   <span class="logo">Deriv</span>
-  <span class="sep">|</span>
-  <span class="section-title">API Dashboard</span>
-  <span class="sep">›</span>
-  <span class="section-title" style="color:#fff">App Builder</span>
+  <span class="divider"></span>
+  <span class="nav-text">API Dashboard</span>
+  <span class="nav-text" style="color:#444;">›</span>
+  <span class="nav-text active">App Builder</span>
   <span class="badge">New</span>
 </div>
 
-<div class="container">
+<div class="shell">
   <!-- Stepper -->
   <div class="stepper">
-    <div class="step-item">
-      <div class="step-circle active" id="sc1">1</div>
-      <span class="step-label active" id="sl1">Configure</span>
-    </div>
-    <div class="step-line" id="line1"></div>
-    <div class="step-item">
-      <div class="step-circle" id="sc2">2</div>
-      <span class="step-label" id="sl2">Customise</span>
-    </div>
-    <div class="step-line" id="line2"></div>
-    <div class="step-item">
-      <div class="step-circle" id="sc3">3</div>
-      <span class="step-label" id="sl3">Host &amp; Export</span>
-    </div>
+    <div class="s-step"><div class="s-dot on" id="d1">1</div><span class="s-lbl on" id="l1">Configure</span></div>
+    <div class="s-line" id="ln1"></div>
+    <div class="s-step"><div class="s-dot" id="d2">2</div><span class="s-lbl" id="l2">Customise</span></div>
+    <div class="s-line" id="ln2"></div>
+    <div class="s-step"><div class="s-dot" id="d3">3</div><span class="s-lbl" id="l3">Host & Export</span></div>
   </div>
 
-  <!-- STEP 1: Configure -->
+  <!-- ==================== STEP 1: CONFIGURE ==================== -->
   <div class="card" id="step1">
-    <h2>Configure your app</h2>
-    <p class="subtitle">Connect your Deriv account and set your trading parameters.</p>
+    <div class="card-title">Configure Your Application</div>
+    <div class="card-sub">Set up your app identity, permissions, and trading parameters.</div>
 
-    <div class="callout">You'll need an active Deriv App ID. <a href="#" style="color:var(--red);font-weight:600;">Create one here →</a></div>
+    <!-- App name -->
+    <div class="sect">App's name <span class="tip">i</span></div>
+    <div class="fld">
+      <input type="text" id="appName" placeholder="Enter your app's name" maxlength="48" oninput="vName()">
+      <ul class="rules">
+        <li>Only alphanumeric characters with spaces and underscores are allowed.</li>
+        <li>The name can contain up to 48 characters.</li>
+        <li>The name cannot contain "Binary", "Deriv", or similar words.</li>
+      </ul>
+      <div class="err-msg" id="nameErr">App name cannot contain "Binary", "Deriv", or similar words.</div>
+    </div>
 
-    <div class="two-col">
-      <div class="field">
-        <label>App ID <span class="valid-badge hidden" id="appid-badge"></span></label>
-        <input type="text" id="appId" placeholder="e.g. 12345" oninput="validateAppId()">
-        <div class="hint">Your registered Deriv application ID</div>
-        <div class="error-msg">Please enter a valid numeric App ID</div>
+    <!-- Markup -->
+    <div class="sect">Markup <span class="tip">i</span></div>
+    <div class="info"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#2684FC" stroke-width="1.5"/><path d="M8 7v4M8 5h.01" stroke="#2684FC" stroke-width="1.5" stroke-linecap="round"/></svg> Markup is only available for real accounts and trading applications.</div>
+    <div class="fld">
+      <div class="mk-wrap">
+        <button onclick="adjMk(-0.1)">−</button>
+        <input type="number" id="markup" value="0" min="0" max="5" step="0.01" oninput="vMk()">
+        <span class="unit">%</span>
+        <button onclick="adjMk(0.1)">+</button>
       </div>
-      <div class="field">
-        <label>Auth Redirect URL</label>
-        <input type="url" id="authUrl" placeholder="https://yourapp.com/callback" oninput="validateUrl()">
-        <div class="hint">OAuth redirect URI for authentication</div>
-        <div class="error-msg">Must be a valid HTTPS URL</div>
+      <div class="hint">The maximum allowable markup is 5% for a limited time.</div>
+      <div class="err-msg" id="mkErr">Markup cannot exceed 5%.</div>
+    </div>
+
+    <!-- OAuth Scope -->
+    <div class="sect">OAuth Scope <span class="tip">i</span></div>
+    <div class="scope-row">
+      <div class="scope-wrap">
+        <label class="scope" onclick="tScope(this)"><input type="checkbox"> Account Manage</label>
+        <div class="scope-tooltip">Provides access to create options trading accounts</div>
+      </div>
+      <div class="scope-wrap">
+        <label class="scope" onclick="tScope(this)"><input type="checkbox"> Trade</label>
+        <div class="scope-tooltip">Provides access to buying and selling contracts</div>
       </div>
     </div>
 
-    <div class="two-col">
-      <div class="field">
-        <label>Affiliate Token <span class="optional">(optional)</span></label>
-        <input type="text" id="affiliateToken" placeholder="e.g. aff_abc123">
-        <div class="hint">For tracking referrals</div>
-      </div>
-      <div class="field">
-        <label>Markup Percentage</label>
-        <div class="markup-wrapper">
-          <input type="number" id="markup" placeholder="0.00" min="0" max="5" step="0.01" oninput="validateMarkup()">
-          <span class="suffix">%</span>
-        </div>
-        <div class="hint">0 – 5% (max two decimal places)</div>
-        <div class="error-msg">Markup cannot exceed 5%</div>
-      </div>
+    <!-- Referral link -->
+    <div class="sect" style="margin-top:20px;">Referral link <span class="tip">i</span></div>
+    <div class="fld">
+      <input type="url" id="referralLink" placeholder="e.g. https://deriv.com/?ref=abc123">
+      <div class="hint">Your unique referral link for tracking sign-ups from this app.</div>
     </div>
 
-    <div class="field">
-      <label>App Template</label>
-      <select id="template">
-        <option value="digits-no-charts">Digits (without charts)</option>
-        <option value="digits-charts" disabled>Digits (with charts) — coming soon</option>
-      </select>
+    <!-- App template -->
+    <div class="sect">App Template</div>
+    <div class="fld">
+      <select id="tmpl"><option value="digits-no-charts">Digits (without charts)</option><option value="digits-charts" disabled>Digits (with charts) — coming soon</option></select>
+    </div>
+
+    <!-- T&C -->
+    <div class="tc">
+      <input type="checkbox" id="tcCb">
+      <span>By registering your application, you acknowledge that you've read and accepted the <a href="#">Deriv API terms and conditions</a> and <a href="#">General Business Partners terms and conditions</a>.</span>
     </div>
 
     <div class="btn-row">
       <span></span>
-      <button class="btn btn-primary" onclick="goStep(2)">Continue to Customise →</button>
+      <button class="btn btn-p" onclick="go(2)">Continue →</button>
     </div>
   </div>
 
-  <!-- STEP 2: Customise -->
+  <!-- ==================== STEP 2: CUSTOMISE ==================== -->
   <div class="card hidden" id="step2">
-    <h2>Customise your app</h2>
-    <p class="subtitle">Add your branding so the app looks like yours.</p>
+    <div class="card-title">Customise Your App</div>
+    <div class="card-sub">Add your branding so the app looks like yours.</div>
 
     <div class="two-col">
       <div>
-        <div class="field">
-          <label>Logo</label>
-          <div class="upload-zone" id="uploadZone" onclick="simulateUpload()">
-            <div class="icon" id="uploadIcon">📁</div>
-            <div class="label" id="uploadLabel">Click to upload logo</div>
-            <div class="formats">PNG, JPG, SVG — max 2 MB</div>
-          </div>
+        <div class="sect" style="margin-top:0;">Logo</div>
+        <div class="upload" id="upZone" onclick="simUpload()">
+          <div class="u-icon" id="upIcon">📁</div>
+          <div class="u-label" id="upLbl">Click to upload logo</div>
+          <div class="u-fmt">PNG, JPG, SVG — max 2 MB</div>
         </div>
 
-        <div class="field">
-          <label>Primary Brand Colour</label>
-          <div class="colour-row">
-            <input type="color" id="brandColour" value="#FF444F" oninput="updatePreview()">
-            <input type="text" id="brandColourHex" value="#FF444F" placeholder="#FF444F" oninput="syncColour()">
-          </div>
-          <div class="hint">Used for buttons, highlights, and accents</div>
+        <div class="sect">Primary brand colour</div>
+        <div class="colour-row">
+          <input type="color" id="bCol" value="#FF444F" oninput="updPreview()">
+          <input type="text" id="bHex" value="#FF444F" oninput="syncHex()">
         </div>
+        <div class="hint">Used for buttons, highlights, and accents</div>
       </div>
-
       <div>
-        <div class="preview-pane">
-          <div class="preview-title">Live Preview</div>
-          <div class="preview-phone">
-            <div class="phone-header">
-              <div class="phone-logo" id="previewLogo">Logo</div>
-              <div class="phone-title" id="previewTitle">Your Trading App</div>
+        <div class="preview-box">
+          <div class="preview-label">Live Preview</div>
+          <div class="phone">
+            <div class="ph-head">
+              <div class="ph-logo" id="pLogo">Logo</div>
+              <div class="ph-name" id="pName">Your Trading App</div>
             </div>
-            <div class="phone-body">
-              <div style="font-size:10px;color:var(--grey-400);text-align:center;margin-bottom:4px;">DIGITS PREDICTION</div>
-              <div class="phone-digit-row">
-                <div class="digit-box" id="d0" style="background:var(--red)">3</div>
-                <div class="digit-box" id="d1" style="background:var(--red)">7</div>
-                <div class="digit-box" id="d2" style="background:var(--red)">1</div>
-                <div class="digit-box" id="d3" style="background:var(--red)">9</div>
-                <div class="digit-box" id="d4" style="background:var(--red)">5</div>
+            <div class="ph-body">
+              <div style="font-size:9px;color:var(--g5);text-align:center;margin-bottom:3px;">DIGITS PREDICTION</div>
+              <div class="ph-digits">
+                <div class="ph-d pDigit" style="background:var(--red)">3</div>
+                <div class="ph-d pDigit" style="background:var(--red)">7</div>
+                <div class="ph-d pDigit" style="background:var(--red)">1</div>
+                <div class="ph-d pDigit" style="background:var(--red)">9</div>
+                <div class="ph-d pDigit" style="background:var(--red)">5</div>
               </div>
-              <div class="phone-bar" style="background:var(--grey-200)"></div>
-              <div class="phone-bar phone-bar-short" style="background:var(--grey-200)"></div>
-              <div style="font-size:10px;color:var(--grey-400);margin:12px 0 4px;">Stake</div>
-              <div style="background:var(--grey-100);border-radius:4px;padding:6px 8px;font-size:12px;font-weight:600;">10.00 USD</div>
-              <div class="phone-btn" id="previewBtn" style="background:var(--red)">Trade Now</div>
+              <div class="ph-bar"></div>
+              <div class="ph-bar ph-bar-s"></div>
+              <div style="font-size:9px;color:var(--g5);margin:10px 0 3px;">Stake</div>
+              <div style="background:var(--g1);border-radius:4px;padding:5px 8px;font-size:11px;font-weight:600;">10.00 USD</div>
+              <div class="ph-btn pBtn" style="background:var(--red)">Trade Now</div>
             </div>
           </div>
         </div>
@@ -308,186 +300,172 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-secondary" onclick="goStep(1)">← Back</button>
-      <button class="btn btn-primary" onclick="goStep(3)">Continue to Host & Export →</button>
+      <button class="btn btn-s" onclick="go(1)">← Back</button>
+      <button class="btn btn-p" onclick="go(3)">Continue →</button>
     </div>
   </div>
 
-  <!-- STEP 3: Host & Export -->
+  <!-- ==================== STEP 3: HOST & EXPORT ==================== -->
   <div class="card hidden" id="step3">
-    <h2>Host &amp; Export</h2>
-    <p class="subtitle">Deploy your app live or download the source code.</p>
+    <div class="card-title">Host & Export</div>
+    <div class="card-sub">Deploy your app live or download the source code.</div>
 
-    <h3 style="font-size:15px;margin-bottom:14px;color:var(--grey-900);">Deploy to hosting provider</h3>
-    <div class="host-grid">
-      <div class="host-card" id="hostNetlify" onclick="selectHost('netlify')">
-        <div class="host-icon">▲</div>
-        <div class="host-name">Netlify</div>
-        <div class="host-desc">Connect your Netlify account and deploy instantly</div>
+    <!-- Deploy -->
+    <div class="sect" style="margin-top:0;">Deploy to a hosting provider</div>
+    <div class="deploy-grid">
+      <div class="d-card" id="hNet" onclick="pickHost('netlify')">
+        <div class="d-icon">▲</div>
+        <div class="d-name">Netlify</div>
+        <div class="d-desc">One-click deploy to Netlify</div>
       </div>
-      <div class="host-card" id="hostVercel" onclick="selectHost('vercel')">
-        <div class="host-icon">◆</div>
-        <div class="host-name">Vercel</div>
-        <div class="host-desc">Connect your Vercel account and deploy instantly</div>
+      <div class="d-card" id="hVer" onclick="pickHost('vercel')">
+        <div class="d-icon">◆</div>
+        <div class="d-name">Vercel</div>
+        <div class="d-desc">One-click deploy to Vercel</div>
+      </div>
+    </div>
+    <div class="info" style="margin-bottom:12px;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#2684FC" stroke-width="1.5"/><path d="M8 7v4M8 5h.01" stroke="#2684FC" stroke-width="1.5" stroke-linecap="round"/></svg> Redirect URL will be configured automatically from your deploy domain.</div>
+    <button class="btn btn-deploy" id="deployBtn" disabled onclick="simDeploy()">🚀 Deploy App</button>
+    <div class="success" id="successBox">
+      <div class="s-icon">✅</div>
+      <h4>App deployed successfully!</h4>
+      <p style="font-size:12px;color:var(--g7);">Your Digits trading app is now live.</p>
+      <div class="live-url" id="liveUrl">https://digits-app.netlify.app</div>
+    </div>
+
+    <hr class="sep">
+
+    <!-- Export -->
+    <div class="sect">Export source code</div>
+    <div class="deploy-grid">
+      <div class="d-card" onclick="pickExport('self')">
+        <div class="d-icon">🖥</div>
+        <div class="d-name">Self-host</div>
+        <div class="d-desc">I'll host it on my own server</div>
+      </div>
+      <div class="d-card" onclick="simExport('zip')">
+        <div class="d-icon">⬇</div>
+        <div class="d-name">Download ZIP</div>
+        <div class="d-desc">Get the full source code</div>
       </div>
     </div>
 
-    <button class="btn btn-deploy" id="deployBtn" disabled onclick="simulateDeploy()">🚀 Deploy App</button>
-
-    <div class="success-banner" id="successBanner">
-      <div class="success-icon">✅</div>
-      <h3>App deployed successfully!</h3>
-      <p style="font-size:14px;color:var(--grey-600);">Your Digits trading app is now live.</p>
-      <div class="url" id="liveUrl">https://your-app.netlify.app</div>
-    </div>
-
-    <hr class="divider">
-
-    <div class="export-section">
-      <h3>Export source code</h3>
-      <div style="display:flex;gap:12px;">
-        <button class="btn btn-export" onclick="simulateExport('github')">⬡ Push to GitHub</button>
-        <button class="btn btn-secondary" onclick="simulateExport('zip')">⬇ Download ZIP</button>
+    <!-- Self-host: URL config appears here -->
+    <div class="self-host-section" id="selfHostSection">
+      <div class="info"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#2684FC" stroke-width="1.5"/><path d="M8 7v4M8 5h.01" stroke="#2684FC" stroke-width="1.5" stroke-linecap="round"/></svg> Since you're self-hosting, provide your redirect URL for OAuth to work.</div>
+      <div class="sect" style="margin-top:10px;">URL Configuration <span class="tip">i</span></div>
+      <div id="urlBox">
+        <div class="url-row">
+          <input type="url" placeholder="Redirect URL 1" id="selfUrl">
+          <button class="url-btn" onclick="addUrl()" title="Add URL">+</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn btn-dark" onclick="simExport('github')">⬡ Push to GitHub</button>
+        <button class="btn btn-s" onclick="simExport('zip')">⬇ Download ZIP</button>
       </div>
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-secondary" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-s" onclick="go(2)">← Back</button>
       <span></span>
     </div>
   </div>
 </div>
 
 <script>
-let currentStep = 1;
-let selectedHost = null;
-let logoUploaded = false;
+let host = null, urlN = 1;
 
-function goStep(step) {
-  if (step === 2 && !validateStep1()) return;
-
-  document.getElementById('step1').classList.toggle('hidden', step !== 1);
-  document.getElementById('step2').classList.toggle('hidden', step !== 2);
-  document.getElementById('step3').classList.toggle('hidden', step !== 3);
-
-  for (let i = 1; i <= 3; i++) {
-    const circle = document.getElementById('sc' + i);
-    const label = document.getElementById('sl' + i);
-    circle.classList.remove('active', 'done');
-    label.classList.remove('active', 'done');
-    if (i < step) { circle.classList.add('done'); circle.textContent = '✓'; label.classList.add('done'); }
-    else if (i === step) { circle.classList.add('active'); circle.textContent = i; label.classList.add('active'); }
-    else { circle.textContent = i; }
-  }
-  document.getElementById('line1').classList.toggle('done', step > 1);
-  document.getElementById('line2').classList.toggle('done', step > 2);
-
-  currentStep = step;
+function go(s) {
+  if (s === 2 && !v1()) return;
+  ['step1','step2','step3'].forEach((id,i) => document.getElementById(id).classList.toggle('hidden', i+1 !== s));
+  [1,2,3].forEach(i => {
+    const dot = document.getElementById('d'+i), lbl = document.getElementById('l'+i);
+    dot.classList.remove('on','done'); lbl.classList.remove('on','done');
+    if (i < s) { dot.classList.add('done'); dot.textContent = '✓'; lbl.classList.add('done'); }
+    else if (i === s) { dot.classList.add('on'); dot.textContent = i; lbl.classList.add('on'); }
+    else { dot.textContent = i; }
+  });
+  document.getElementById('ln1').classList.toggle('done', s > 1);
+  document.getElementById('ln2').classList.toggle('done', s > 2);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function validateStep1() {
-  let valid = true;
-  const appId = document.getElementById('appId');
-  const authUrl = document.getElementById('authUrl');
-  const markup = document.getElementById('markup');
-
-  if (!appId.value || isNaN(appId.value)) { appId.classList.add('error'); valid = false; } else { appId.classList.remove('error'); }
-  if (!authUrl.value || !authUrl.value.startsWith('https://')) { authUrl.classList.add('error'); valid = false; } else { authUrl.classList.remove('error'); }
-  if (markup.value && (parseFloat(markup.value) > 5 || parseFloat(markup.value) < 0)) { markup.classList.add('error'); valid = false; } else { markup.classList.remove('error'); }
-
-  return valid;
+function v1() {
+  let ok = true;
+  const n = document.getElementById('appName'), m = document.getElementById('markup'), tc = document.getElementById('tcCb');
+  const bad = /binary|deriv/i;
+  if (!n.value.trim()) { n.classList.add('err'); ok = false; } else if (bad.test(n.value)) { n.classList.add('err'); show('nameErr'); ok = false; } else { n.classList.remove('err'); hide('nameErr'); }
+  const mv = parseFloat(m.value);
+  if (m.value && (mv > 5 || mv < 0)) { show('mkErr'); ok = false; } else { hide('mkErr'); }
+  if (!tc.checked) { tc.style.outline = '2px solid var(--red)'; tc.style.outlineOffset = '2px'; ok = false; } else { tc.style.outline = 'none'; }
+  return ok;
 }
 
-function validateAppId() {
-  const el = document.getElementById('appId');
-  const badge = document.getElementById('appid-badge');
-  if (el.value && !isNaN(el.value) && el.value.length >= 3) {
-    badge.classList.remove('hidden', 'fail');
-    badge.classList.add('ok');
-    badge.textContent = '✓ Valid';
-    el.classList.remove('error');
-  } else if (el.value) {
-    badge.classList.remove('hidden', 'ok');
-    badge.classList.add('fail');
-    badge.textContent = '✗ Invalid';
-  } else {
-    badge.classList.add('hidden');
-  }
+function vName() {
+  const el = document.getElementById('appName');
+  if (/binary|deriv/i.test(el.value)) { el.classList.add('err'); show('nameErr'); } else { el.classList.remove('err'); hide('nameErr'); }
 }
-
-function validateUrl() {
-  const el = document.getElementById('authUrl');
-  if (el.value && !el.value.startsWith('https://')) { el.classList.add('error'); } else { el.classList.remove('error'); }
+function vMk() {
+  const el = document.getElementById('markup'), v = parseFloat(el.value);
+  if (v > 5) el.value = 5; if (v < 0) el.value = 0;
+  (v > 5 || v < 0) ? show('mkErr') : hide('mkErr');
 }
-
-function validateMarkup() {
-  const el = document.getElementById('markup');
-  const val = parseFloat(el.value);
-  if (el.value && (val > 5 || val < 0)) { el.classList.add('error'); } else { el.classList.remove('error'); }
+function adjMk(d) {
+  const el = document.getElementById('markup'); let v = parseFloat(el.value)||0;
+  v = Math.round((v+d)*100)/100; if(v<0)v=0; if(v>5)v=5; el.value=v;
 }
+function tScope(el) { setTimeout(() => el.classList.toggle('on', el.querySelector('input').checked), 0); }
 
-function simulateUpload() {
-  const zone = document.getElementById('uploadZone');
-  const icon = document.getElementById('uploadIcon');
-  const label = document.getElementById('uploadLabel');
-  zone.classList.add('has-file');
-  icon.textContent = '✓';
-  label.textContent = 'logo.png uploaded';
-  logoUploaded = true;
-  // Simulate logo in preview
-  document.getElementById('previewLogo').innerHTML = '<div style="width:100%;height:100%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:800;">D</div>';
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+// Step 2
+function simUpload() {
+  const z = document.getElementById('upZone');
+  z.classList.add('ok'); document.getElementById('upIcon').textContent = '✓'; document.getElementById('upLbl').textContent = 'logo.png uploaded';
+  document.getElementById('pLogo').innerHTML = '<div style="width:100%;height:100%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;">D</div>';
 }
+function updPreview() { const c = document.getElementById('bCol').value; document.getElementById('bHex').value = c; applyC(c); }
+function syncHex() { const h = document.getElementById('bHex').value; if (/^#[0-9A-Fa-f]{6}$/.test(h)) { document.getElementById('bCol').value = h; applyC(h); } }
+function applyC(c) { document.querySelectorAll('.pDigit').forEach(e => e.style.background = c); document.querySelector('.pBtn').style.background = c; }
 
-function updatePreview() {
-  const colour = document.getElementById('brandColour').value;
-  document.getElementById('brandColourHex').value = colour;
-  applyPreviewColour(colour);
-}
-
-function syncColour() {
-  const hex = document.getElementById('brandColourHex').value;
-  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
-    document.getElementById('brandColour').value = hex;
-    applyPreviewColour(hex);
-  }
-}
-
-function applyPreviewColour(colour) {
-  document.querySelectorAll('.digit-box').forEach(el => el.style.background = colour);
-  document.getElementById('previewBtn').style.background = colour;
-}
-
-function selectHost(host) {
-  selectedHost = host;
-  document.getElementById('hostNetlify').classList.toggle('selected', host === 'netlify');
-  document.getElementById('hostVercel').classList.toggle('selected', host === 'vercel');
+// Step 3
+function pickHost(h) {
+  host = h;
+  document.getElementById('hNet').classList.toggle('on', h === 'netlify');
+  document.getElementById('hVer').classList.toggle('on', h === 'vercel');
   document.getElementById('deployBtn').disabled = false;
+  document.getElementById('selfHostSection').classList.remove('show');
 }
-
-function simulateDeploy() {
-  const btn = document.getElementById('deployBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Deploying...';
-
+function simDeploy() {
+  const b = document.getElementById('deployBtn'); b.disabled = true; b.textContent = '⏳ Deploying...';
   setTimeout(() => {
-    btn.textContent = '✅ Deployed!';
-    const banner = document.getElementById('successBanner');
-    banner.style.display = 'block';
-    const appId = document.getElementById('appId').value || 'my-app';
-    const host = selectedHost === 'netlify' ? 'netlify.app' : 'vercel.app';
-    document.getElementById('liveUrl').textContent = 'https://digits-' + appId + '.' + host;
-  }, 2000);
+    b.textContent = '✅ Deployed!';
+    const box = document.getElementById('successBox'); box.style.display = 'block';
+    const name = (document.getElementById('appName').value || 'my-app').toLowerCase().replace(/[^a-z0-9]/g,'-');
+    const dom = host === 'netlify' ? 'netlify.app' : 'vercel.app';
+    document.getElementById('liveUrl').textContent = 'https://' + name + '.' + dom;
+  }, 1800);
 }
-
-function simulateExport(type) {
-  if (type === 'github') {
-    alert('Prototype: This would open GitHub OAuth and push to a new repository.');
-  } else {
-    alert('Prototype: This would download digits-app-source.zip (HTML/CSS/JS + README).');
+function pickExport(type) {
+  if (type === 'self') {
+    document.getElementById('selfHostSection').classList.add('show');
+    document.getElementById('hNet').classList.remove('on');
+    document.getElementById('hVer').classList.remove('on');
+    host = null; document.getElementById('deployBtn').disabled = true;
   }
+}
+function simExport(type) {
+  if (type === 'github') alert('Prototype: Opens GitHub OAuth → pushes to a new repository.');
+  else alert('Prototype: Downloads digits-app-source.zip');
+}
+function addUrl() {
+  urlN++;
+  const row = document.createElement('div'); row.className = 'url-row';
+  row.innerHTML = '<input type="url" placeholder="Redirect URL '+urlN+'"><button class="url-btn" onclick="this.parentElement.remove()" title="Remove">×</button>';
+  document.getElementById('urlBox').appendChild(row);
 }
 </script>
-
 </body>
 </html>
